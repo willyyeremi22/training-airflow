@@ -1,0 +1,82 @@
+name: training-airflow
+
+x-airflow-common:
+  &airflow-common
+  image: apache/airflow:2.9.1-python3.10
+  networks:
+    - shared-network
+  env_file:
+    - .env
+
+services:
+  postgresql:
+    image: postgres:17-alpine
+    container_name: training-airflow-postgresql
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - training-airflow-postgresql-vol:/var/lib/postgresql/data
+      - ./initial_setup/postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - shared-network
+
+  airflow-scheduler:
+    <<: *airflow-common
+    depends_on:
+      - postgresql
+    container_name: training-airflow-airflow-scheduler
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY}
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_ODS_USERNAME}:${AIRFLOW_ODS_PASSWORD}@${AIRFLOW_ODS_HOST}:${AIRFLOW_ODS_PORT}/${AIRFLOW_ODS_DBNAME}
+      AIRFLOW__LOGGING__WORKER_LOG_SERVER_HOST: airflow-scheduler
+      AIRFLOW__WEBSERVER__SECRET_KEY: ${SECRET_KEY}
+    volumes:
+      - ./container_data/airflow/logs:/opt/airflow/logs
+      - ./container_data/airflow/plugins:/opt/airflow/plugins
+      - ./container_data/airflow/dags:/opt/airflow/dags
+      - ./container_data/airflow/venv_dir:/home/airflow/venv_dir
+      - ./container_data/airflow/job_dir:/home/airflow/job_dir
+      - ./container_data/airflow/output:/home/airflow/output
+    command: >
+      bash -c "
+      airflow version &&     
+      airflow db migrate && 
+      airflow scheduler
+      "
+
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: training-airflow-airflow-webserver
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_ODS_USERNAME}:${AIRFLOW_ODS_PASSWORD}@${AIRFLOW_ODS_HOST}:${AIRFLOW_ODS_PORT}/${AIRFLOW_ODS_DBNAME}
+      AIRFLOW__LOGGING__WORKER_LOG_SERVER_HOST: airflow-scheduler
+      AIRFLOW__WEBSERVER__SECRET_KEY: ${SECRET_KEY}
+    depends_on:
+      - airflow-scheduler
+      - postgresql
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./container_data/airflow/plugins:/opt/airflow/plugins
+    command: >
+      bash -c "
+      airflow version && 
+      airflow users create --username admin --password admin --firstname system --lastname administrator --role Admin --email example@example.org &&
+      airflow webserver --port 8080
+      "
+
+volumes:
+  training-airflow-postgresql-vol:
+  training-airflow-airflow-scheduler-vol:
+
+networks:
+  shared-network:
+    name: training-airflow-network

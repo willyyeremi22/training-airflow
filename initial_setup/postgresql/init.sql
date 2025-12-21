@@ -1,0 +1,11 @@
+create database ods_airflow;
+
+\c ods_airflow;
+
+CREATE USER airflow_app WITH PASSWORD 'password';
+GRANT ALL PRIVILEGES ON DATABASE ods_airflow TO airflow_app;
+GRANT ALL ON SCHEMA public TO airflow_app;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO airflow_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO airflow_app;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO airflow_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO airflow_app;

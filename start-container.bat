@@ -1,0 +1,1 @@
+docker-compose -p training-airflow -f compose.yml up -d
