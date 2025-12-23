@@ -8,6 +8,7 @@ from pandas import read_sql
 # import default library
 ##################################################
 from urllib.parse import quote_plus
+import csv
 
 ##################################################
 
@@ -42,14 +43,15 @@ def create_url(product: str, credential_name: str) -> str:
 ##################################################
 def main():
     input_url = create_url("mssql","10.11.88.218 stg_host")
-    connection = connect(input_url)
-    connection.setdecoding(SQL_CHAR, encoding='utf-8')
-    with connection.cursor() as cursor:
-        cursor.execute("select top 100 * from dbo.current_cc_scmcaccp")
-        data = cursor.fetchall()
-        with open(f"{OUTPUT_DIRECTORY}/dbo__current_cc_scmcaccp.txt", "w", encoding="utf-8") as f:
-            for row in data:
-                f.write(", ".join(map(str, row)) + "\n")
+    with connect(input_url) as connection:
+        connection.setdecoding(SQL_CHAR, encoding='utf-8')
+        with connection.cursor() as cursor:
+            cursor.execute("select * from dbo.current_cc_scmcaccp")
+            for i in range(0,10):
+                data = cursor.fetchmany(size=100)
+                with open(f"{OUTPUT_DIRECTORY}/dbo__current_cc_scmcaccp_{i}.txt", "a", newline="", encoding="utf-8") as f:
+                    writer = csv.writer(f, delimiter="|", quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    writer.writerows(data)
 
 ##################################################
 # test
