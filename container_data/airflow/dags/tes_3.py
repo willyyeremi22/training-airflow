@@ -17,56 +17,56 @@ from datetime import timedelta
 ##################################################
 # global variable
 ##################################################
-VENV_PATH = "/home/airflow/venv_dir/venv_1/bin/python"
+VENV_PATH = "/opt/airflow/venv_dir/venv_1/bin/python"
 
 ##################################################
 # task definition
 ##################################################
 def rnacen__ontology_terms():
     import sys
-    sys.path.insert(0, "/home/airflow/job_dir/tes_3")
+    sys.path.insert(0, "/opt/airflow/job_dir/tes_3")
     from rnacen__ontology_terms import main
     main()
 
 def rnacen__rfam_clans():
     import sys
-    sys.path.insert(0, "/home/airflow/job_dir/tes_3")
+    sys.path.insert(0, "/opt/airflow/job_dir/tes_3")
     from rnacen__rfam_clans import main
     main()
 
 def rnacen__rnc_release():
     import sys
-    sys.path.insert(0, "/home/airflow/job_dir/tes_3")
+    sys.path.insert(0, "/opt/airflow/job_dir/tes_3")
     from rnacen__rnc_release import main
     main()
 
 def rnacen__rfam_models():
     import sys
-    sys.path.insert(0, "/home/airflow/job_dir/tes_3")
+    sys.path.insert(0, "/opt/airflow/job_dir/tes_3")
     from rnacen__rfam_models import main
     main()
 
 def rnacen__rnc_taxonomy():
     import sys
-    sys.path.insert(0, "/home/airflow/job_dir/tes_3")
+    sys.path.insert(0, "/opt/airflow/job_dir/tes_3")
     from rnacen__rnc_taxonomy import main
     main()
     
 def rnacen__rnc_accessions():
     import sys
-    sys.path.insert(0, "/home/airflow/job_dir/tes_3")
+    sys.path.insert(0, "/opt/airflow/job_dir/tes_3")
     from rnacen__rnc_accessions import main
     main()
     
 def rnacen__rnc_rna_precomputed():
     import sys
-    sys.path.insert(0, "/home/airflow/job_dir/tes_3")
+    sys.path.insert(0, "/opt/airflow/job_dir/tes_3")
     from rnacen__rnc_rna_precomputed import main
     main()
 
 def rnacen__rnc_interactions():
     import sys
-    sys.path.insert(0, "/home/airflow/job_dir/tes_3")
+    sys.path.insert(0, "/opt/airflow/job_dir/tes_3")
     from rnacen__rnc_interactions import main
     main()
 

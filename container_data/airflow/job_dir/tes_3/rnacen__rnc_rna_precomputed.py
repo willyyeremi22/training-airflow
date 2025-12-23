@@ -34,7 +34,7 @@ CONNECTIONS = {
 ##################################################
 # function to execute
 ##################################################
-def create_url(product, credential_name) -> str:
+def create_url(product: str, credential_name: str) -> str:
     url = URL.create(
         f"""{product}+{CONNECTIONS[product]["driver"]}""",
         username=f"""{CONNECTIONS[product]["credentials"][credential_name]["username"]}""",

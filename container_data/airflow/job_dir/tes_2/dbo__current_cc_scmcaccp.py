@@ -1,8 +1,7 @@
 ##################################################
 # import installed library
 ##################################################
-from sqlalchemy import create_engine
-from sqlalchemy.engine import URL
+from mssql_python import connect, SQL_CHAR
 from pandas import read_sql
 
 ##################################################
@@ -15,7 +14,7 @@ from urllib.parse import quote_plus
 ##################################################
 # global variable
 ##################################################
-OUTPUT_DIRECTORY = """/home/airflow/output/tes_2"""
+OUTPUT_DIRECTORY = """/home/airflow/etl_output/tes_2"""
 CONNECTIONS = {
     "mssql": {
         "driver": "pymssql",
@@ -34,15 +33,8 @@ CONNECTIONS = {
 ##################################################
 # function to execute
 ##################################################
-def create_url(product, credential_name) -> str:
-    url = URL.create(
-        f"""{product}+{CONNECTIONS[product]["driver"]}""",
-        username=f"""{CONNECTIONS[product]["credentials"][credential_name]["username"]}""",
-        password=quote_plus(f"""{CONNECTIONS[product]["credentials"][credential_name]["password"]}"""),  
-        host=f"""{CONNECTIONS[product]["credentials"][credential_name]["host"]}""",
-        port=f"""{CONNECTIONS[product]["credentials"][credential_name]["port"]}""",
-        database=f"""{CONNECTIONS[product]["credentials"][credential_name]["database"]}""",
-    )
+def create_url(product: str, credential_name: str) -> str:
+    url = f"""Server={CONNECTIONS[product]["credentials"][credential_name]["host"]};Database={CONNECTIONS[product]["credentials"][credential_name]["database"]};UID={CONNECTIONS[product]["credentials"][credential_name]["username"]};PWD={CONNECTIONS[product]["credentials"][credential_name]["password"]};Encrypt=no;TrustServerCertificate=yes;"""
     return url
 
 ##################################################
@@ -50,10 +42,14 @@ def create_url(product, credential_name) -> str:
 ##################################################
 def main():
     input_url = create_url("mssql","10.11.88.218 stg_host")
-    engine = create_engine(url=input_url)
-    data = read_sql(sql=f"select top 100 * from dbo.current_cc_scmaccp",con=engine,chunksize=10)
-    for i, chunk in enumerate(data):
-        chunk.to_csv(f"{OUTPUT_DIRECTORY}/dbo__current_cc_scmaccp.csv", mode="a", header=(i==0), index=False)
+    connection = connect(input_url)
+    connection.setdecoding(SQL_CHAR, encoding='utf-8')
+    with connection.cursor() as cursor:
+        cursor.execute("select top 100 * from dbo.current_cc_scmcaccp")
+        data = cursor.fetchall()
+        with open(f"{OUTPUT_DIRECTORY}/dbo__current_cc_scmcaccp.txt", "w", encoding="utf-8") as f:
+            for row in data:
+                f.write(", ".join(map(str, row)) + "\n")
 
 ##################################################
 # test

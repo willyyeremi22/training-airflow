@@ -17,15 +17,15 @@ from datetime import timedelta
 ##################################################
 # global variable
 ##################################################
-VENV_PATH = "/home/airflow/venv_dir/venv_1/bin/python"
+VENV_PATH = "/opt/airflow/venv_dir/venv_1/bin/python"
 
 ##################################################
 # task definition
 ##################################################
-def dbo__current_cc_scmaccp():
+def dbo__current_cc_scmcaccp():
     import sys
-    sys.path.insert(0, "/home/airflow/job_dir/tes_2")
-    from dbo__current_cc_scmaccp import main
+    sys.path.insert(0, "/opt/airflow/job_dir/tes_2")
+    from dbo__current_cc_scmcaccp import main
     main()
 
 ##################################################
@@ -50,7 +50,7 @@ with DAG(
     start = EmptyOperator(task_id="start")
 
     with TaskGroup("tier_1", tooltip="tier 1 dependency") as tier_1:
-        t_dbo__current_cc_scmaccp = ExternalPythonOperator(task_id="dbo__current_cc_scmaccp",python_callable=dbo__current_cc_scmaccp,python=VENV_PATH)
+        t_dbo__current_cc_scmcaccp = ExternalPythonOperator(task_id="dbo__current_cc_scmcaccp",python_callable=dbo__current_cc_scmcaccp,python=VENV_PATH)
 
     end = EmptyOperator(task_id="end")
     

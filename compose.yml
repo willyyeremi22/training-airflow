@@ -26,6 +26,10 @@ services:
 
   airflow-scheduler:
     <<: *airflow-common
+    build:
+      dockerfile: ./dockerfile/dockerfile.airflow-scheduler
+      context: .
+    image: training-airflow-airflow-scheduler
     depends_on:
       - postgresql
     container_name: training-airflow-airflow-scheduler
@@ -40,9 +44,9 @@ services:
       - ./container_data/airflow/logs:/opt/airflow/logs
       - ./container_data/airflow/plugins:/opt/airflow/plugins
       - ./container_data/airflow/dags:/opt/airflow/dags
-      - ./container_data/airflow/venv_dir:/home/airflow/venv_dir
-      - ./container_data/airflow/job_dir:/home/airflow/job_dir
-      - ./container_data/airflow/output:/home/airflow/output
+      # - ./container_data/airflow/venv_dir:/home/airflow/venv_dir
+      - ./container_data/airflow/job_dir:/opt/airflow/job_dir
+      - ./container_data/airflow/etl_output:/home/airflow/etl_output
     command: >
       bash -c "
       airflow version &&     
@@ -75,7 +79,6 @@ services:
 
 volumes:
   training-airflow-postgresql-vol:
-  training-airflow-airflow-scheduler-vol:
 
 networks:
   shared-network:

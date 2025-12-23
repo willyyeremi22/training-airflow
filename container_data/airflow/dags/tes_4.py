@@ -17,8 +17,8 @@ from datetime import timedelta
 ##################################################
 # global variable
 ##################################################
-VENV_PATH = "/home/airflow/venv_dir/venv_1/bin/python"
-JOB_DIR = "/home/airflow/job_dir/tes_4"
+VENV_PATH = "/opt/airflow/venv_dir/venv_1/bin/python"
+JOB_DIR = "/opt/airflow/job_dir/tes_4"
 
 ##################################################
 # task definition

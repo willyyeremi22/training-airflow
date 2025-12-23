@@ -1,0 +1,11 @@
+FROM apache/airflow:2.9.1-python3.10
+
+USER root
+WORKDIR /opt/airflow
+RUN mkdir venv_dir
+WORKDIR /opt/airflow/venv_dir
+RUN python -m virtualenv venv_1
+WORKDIR /opt/airflow/venv_dir/venv_1/bin
+RUN /opt/airflow/venv_dir/venv_1/bin/python -m pip install sqlalchemy psycopg2-binary pymysql pandas mssql-python
+RUN chown -R airflow: /opt/airflow/venv_dir
+USER airflow
