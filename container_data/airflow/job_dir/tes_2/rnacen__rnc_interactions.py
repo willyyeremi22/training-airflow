@@ -15,17 +15,17 @@ from urllib.parse import quote_plus
 ##################################################
 # global variable
 ##################################################
-OUTPUT_DIRECTORY = """/home/airflow/output/tes_4"""
+OUTPUT_DIRECTORY = """/home/airflow/etl_output/tes_2"""
 CONNECTIONS = {
-    "mysql": {
-        "driver": "pymysql",
+    "postgresql": {
+        "driver": "psycopg2",
         "credentials": {
-            "mysql-rfam-public.ebi.ac.uk Rfam": {
-                "host": "mysql-rfam-public.ebi.ac.uk",
-                "port": "4497",
-                "username": "rfamro",
-                "password": "",
-                "database": "Rfam"
+            "hh-pgsql-public.ebi.ac.uk pfmegrnargs": {
+                "host": "hh-pgsql-public.ebi.ac.uk",
+                "port": "5432",
+                "username": "reader",
+                "password": "NWDMCE5xdipIjRrp",
+                "database": "pfmegrnargs"
             }
         }
     }
@@ -49,11 +49,11 @@ def create_url(product: str, credential_name: str) -> str:
 # pipeline
 ##################################################
 def main():
-    input_url = create_url("mysql","mysql-rfam-public.ebi.ac.uk Rfam")
+    input_url = create_url("postgresql","hh-pgsql-public.ebi.ac.uk pfmegrnargs")
     engine = create_engine(url=input_url)
-    data = read_sql(sql=f"select * from wikitext limit 100",con=engine,chunksize=10)
+    data = read_sql(sql=f"select * from rnacen.rnc_interactions limit 100",con=engine,chunksize=10)
     for i, chunk in enumerate(data):
-        chunk.to_csv(f"{OUTPUT_DIRECTORY}/rfam__wikitext.csv", mode="a", header=(i==0), index=False)
+        chunk.to_csv(f"{OUTPUT_DIRECTORY}/rnacen__rnc_interactions.csv", mode="a", header=(i==0), index=False)
 
 ##################################################
 # test

@@ -15,7 +15,7 @@ from urllib.parse import quote_plus
 ##################################################
 # global variable
 ##################################################
-OUTPUT_DIRECTORY = """/home/airflow/output/tes_4"""
+OUTPUT_DIRECTORY = """/home/airflow/etl_output/tes_3"""
 CONNECTIONS = {
     "mysql": {
         "driver": "pymysql",
@@ -51,9 +51,9 @@ def create_url(product: str, credential_name: str) -> str:
 def main():
     input_url = create_url("mysql","mysql-rfam-public.ebi.ac.uk Rfam")
     engine = create_engine(url=input_url)
-    data = read_sql(sql=f"select * from motif_old limit 100",con=engine,chunksize=10)
+    data = read_sql(sql=f"select * from motif_matches limit 100",con=engine,chunksize=10)
     for i, chunk in enumerate(data):
-        chunk.to_csv(f"{OUTPUT_DIRECTORY}/rfam__motif_old.csv", mode="a", header=(i==0), index=False)
+        chunk.to_csv(f"{OUTPUT_DIRECTORY}/rfam__motif_matches.csv", mode="a", header=(i==0), index=False)
 
 ##################################################
 # test

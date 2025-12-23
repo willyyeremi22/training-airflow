@@ -15,7 +15,7 @@ from urllib.parse import quote_plus
 ##################################################
 # global variable
 ##################################################
-OUTPUT_DIRECTORY = """/home/airflow/output/tes_3"""
+OUTPUT_DIRECTORY = """/home/airflow/etl_output/tes_2"""
 CONNECTIONS = {
     "postgresql": {
         "driver": "psycopg2",
@@ -51,9 +51,9 @@ def create_url(product: str, credential_name: str) -> str:
 def main():
     input_url = create_url("postgresql","hh-pgsql-public.ebi.ac.uk pfmegrnargs")
     engine = create_engine(url=input_url)
-    data = read_sql(sql=f"select * from rnacen.rnc_accessions limit 100",con=engine,chunksize=10)
+    data = read_sql(sql=f"select * from rnacen.ontology_terms limit 100",con=engine,chunksize=10)
     for i, chunk in enumerate(data):
-        chunk.to_csv(f"{OUTPUT_DIRECTORY}/rnacen__rnc_accessions.csv", mode="a", header=(i==0), index=False)
+        chunk.to_csv(f"{OUTPUT_DIRECTORY}/rnacen__ontology_terms.csv", mode="a", header=(i==0), index=False)
 
 ##################################################
 # test

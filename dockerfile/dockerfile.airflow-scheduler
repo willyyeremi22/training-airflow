@@ -6,6 +6,10 @@ RUN mkdir venv_dir
 WORKDIR /opt/airflow/venv_dir
 RUN python -m virtualenv venv_1
 WORKDIR /opt/airflow/venv_dir/venv_1/bin
-RUN /opt/airflow/venv_dir/venv_1/bin/python -m pip install sqlalchemy psycopg2-binary pymysql pandas mssql-python
+RUN /opt/airflow/venv_dir/venv_1/bin/python -m pip install pandas sqlalchemy psycopg2-binary pymysql
+WORKDIR /opt/airflow/venv_dir
+RUN python -m virtualenv venv_2
+WORKDIR /opt/airflow/venv_dir/venv_2/bin
+RUN /opt/airflow/venv_dir/venv_2/bin/python -m pip install pandas psycopg[binary] mssql-python
 RUN chown -R airflow: /opt/airflow/venv_dir
 USER airflow

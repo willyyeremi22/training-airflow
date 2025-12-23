@@ -18,57 +18,20 @@ from datetime import timedelta
 # global variable
 ##################################################
 VENV_PATH = "/opt/airflow/venv_dir/venv_1/bin/python"
+JOB_DIR = "/opt/airflow/job_dir/tes_3"
 
 ##################################################
 # task definition
 ##################################################
-def rnacen__ontology_terms():
-    import sys
-    sys.path.insert(0, "/opt/airflow/job_dir/tes_3")
-    from rnacen__ontology_terms import main
-    main()
-
-def rnacen__rfam_clans():
-    import sys
-    sys.path.insert(0, "/opt/airflow/job_dir/tes_3")
-    from rnacen__rfam_clans import main
-    main()
-
-def rnacen__rnc_release():
-    import sys
-    sys.path.insert(0, "/opt/airflow/job_dir/tes_3")
-    from rnacen__rnc_release import main
-    main()
-
-def rnacen__rfam_models():
-    import sys
-    sys.path.insert(0, "/opt/airflow/job_dir/tes_3")
-    from rnacen__rfam_models import main
-    main()
-
-def rnacen__rnc_taxonomy():
-    import sys
-    sys.path.insert(0, "/opt/airflow/job_dir/tes_3")
-    from rnacen__rnc_taxonomy import main
-    main()
-    
-def rnacen__rnc_accessions():
-    import sys
-    sys.path.insert(0, "/opt/airflow/job_dir/tes_3")
-    from rnacen__rnc_accessions import main
-    main()
-    
-def rnacen__rnc_rna_precomputed():
-    import sys
-    sys.path.insert(0, "/opt/airflow/job_dir/tes_3")
-    from rnacen__rnc_rna_precomputed import main
-    main()
-
-def rnacen__rnc_interactions():
-    import sys
-    sys.path.insert(0, "/opt/airflow/job_dir/tes_3")
-    from rnacen__rnc_interactions import main
-    main()
+def run_job(module_name: str, job_dir: str):
+    from sys import path
+    from importlib import import_module
+    if job_dir not in path:
+        path.insert(0, job_dir)
+    module = import_module(module_name)
+    if not hasattr(module, "main"):
+        raise AttributeError(f"Module '{module_name}' tidak punya fungsi main()")
+    module.main()
 
 ##################################################
 # DAG configuration
@@ -92,18 +55,18 @@ with DAG(
     start = EmptyOperator(task_id="start")
 
     with TaskGroup("tier_1", tooltip="tier 1 dependency") as tier_1:
-        t_rnacen__ontology_terms = ExternalPythonOperator(task_id="rnacen__ontology_terms",python_callable=rnacen__ontology_terms,python=VENV_PATH)
-        t_rnacen__rfam_clans = ExternalPythonOperator(task_id="rnacen__rfam_clans",python_callable=rnacen__rfam_clans,python=VENV_PATH)
-        t_rnacen__rfam_models = ExternalPythonOperator(task_id="rnacen__rfam_models",python_callable=rnacen__rfam_models,python=VENV_PATH)
-        t_rnacen__rnc_release = ExternalPythonOperator(task_id="rnacen__rnc_release",python_callable=rnacen__rnc_release,python=VENV_PATH)
+        t_rfam__motif_old = ExternalPythonOperator(task_id="rfam__motif_old",python_callable=run_job,op_kwargs={"module_name": "rfam__motif_old","job_dir": JOB_DIR},python=VENV_PATH)
+        t_rfam__wikitext = ExternalPythonOperator(task_id="rfam__wikitext",python_callable=run_job,op_kwargs={"module_name": "rfam__wikitext","job_dir": JOB_DIR},python=VENV_PATH)
+        t_rfam__taxonomy = ExternalPythonOperator(task_id="rfam__taxonomy",python_callable=run_job,op_kwargs={"module_name": "rfam__taxonomy","job_dir": JOB_DIR},python=VENV_PATH)
+        t_rfam__literature_reference = ExternalPythonOperator(task_id="rfam__literature_reference",python_callable=run_job,op_kwargs={"module_name": "rfam__literature_reference","job_dir": JOB_DIR},python=VENV_PATH)
 
     with TaskGroup("tier_2", tooltip="tier 2 dependency") as tier_2:
-        t_rnacen__rnc_taxonomy = ExternalPythonOperator(task_id="rnacen__rnc_taxonomy",python_callable=rnacen__rnc_taxonomy,python=VENV_PATH)
-        t_rnacen__rnc_accessions = ExternalPythonOperator(task_id="rnacen__rnc_accessions",python_callable=rnacen__rnc_accessions,python=VENV_PATH)
-        t_rnacen__rnc_rna_precomputed = ExternalPythonOperator(task_id="rnacen__rnc_rna_precomputed",python_callable=rnacen__rnc_rna_precomputed,python=VENV_PATH)
+        t_rfam__family = ExternalPythonOperator(task_id="rfam__family",python_callable=run_job,op_kwargs={"module_name": "rfam__family","job_dir": JOB_DIR},python=VENV_PATH)
+        t_rfam__motif_literature = ExternalPythonOperator(task_id="rfam__motif_literature",python_callable=run_job,op_kwargs={"module_name": "rfam__motif_literature","job_dir": JOB_DIR},python=VENV_PATH)
+        t_rfam__rfamseq = ExternalPythonOperator(task_id="rfam__rfamseq",python_callable=run_job,op_kwargs={"module_name": "rfam__rfamseq","job_dir": JOB_DIR},python=VENV_PATH)
 
     with TaskGroup("tier_3", tooltip="tier 3 dependency") as tier_3:
-        t_rnacen__rnc_interactions = ExternalPythonOperator(task_id="rnacen__rnc_interactions",python_callable=rnacen__rnc_interactions,python=VENV_PATH)
+        t_rfam__motif_matches = ExternalPythonOperator(task_id="rfam__motif_matches",python_callable=run_job,op_kwargs={"module_name": "rfam__motif_matches","job_dir": JOB_DIR},python=VENV_PATH)
 
     end = EmptyOperator(task_id="end")
     
@@ -111,15 +74,15 @@ with DAG(
     start >> tier_1 
     
     # tier 1 downstream configuration
-    t_rnacen__ontology_terms >> [t_rnacen__rnc_taxonomy, t_rnacen__rnc_accessions, t_rnacen__rnc_rna_precomputed]
-    t_rnacen__rfam_clans >> t_rnacen__rnc_taxonomy
-    t_rnacen__rnc_release >> t_rnacen__rnc_rna_precomputed
-    t_rnacen__rfam_models >> end
+    t_rfam__wikitext >> t_rfam__family
+    t_rfam__motif_old >> [t_rfam__motif_matches,t_rfam__motif_literature]
+    t_rfam__taxonomy >> t_rfam__rfamseq
+    t_rfam__literature_reference >> t_rfam__motif_literature
     
     # tier 2 downstream configuration
-    t_rnacen__rnc_rna_precomputed >> t_rnacen__rnc_interactions
-    t_rnacen__rnc_taxonomy >> end
-    t_rnacen__rnc_accessions >> end
+    t_rfam__family >> t_rfam__motif_matches
+    t_rfam__rfamseq >> t_rfam__motif_matches
+    t_rfam__motif_literature >> end
     
     # tier 3 downstream configuration
-    t_rnacen__rnc_interactions >> end
+    t_rfam__motif_matches >> end
