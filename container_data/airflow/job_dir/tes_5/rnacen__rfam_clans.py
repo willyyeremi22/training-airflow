@@ -6,7 +6,7 @@ import psycopg
 ##################################################
 # import default library
 ##################################################
-from csv import writer as csv_writer, QUOTE_MINIMAL
+from csv import writer as csv_writer, QUOTE_ALL
 
 ##################################################
 
@@ -47,7 +47,7 @@ def main():
             for i in range(0,10):
                 data = cursor.fetchmany(size=100)
                 with open(f"{OUTPUT_DIRECTORY}/rnacen__rfam_clans.csv", "a", newline="", encoding="utf-8") as f:
-                    writer = csv_writer(f, delimiter="|", quotechar='"', quoting=QUOTE_MINIMAL)
+                    writer = csv_writer(f, delimiter="|", quotechar='"', quoting=QUOTE_ALL)
                     writer.writerows(data)
 
 ##################################################
