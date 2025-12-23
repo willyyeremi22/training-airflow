@@ -18,7 +18,7 @@ from datetime import timedelta
 # global variable
 ##################################################
 VENV_PATH = "/opt/airflow/venv_dir/venv_2/bin/python"
-JOB_DIR = "/opt/airflow/job_dir/tes_4"
+JOB_DIR = "/opt/airflow/job_dir/tes_5"
 
 ##################################################
 # task definition
@@ -37,8 +37,8 @@ def run_job(module_name: str, job_dir: str):
 # DAG configuration
 ##################################################
 with DAG(
-    dag_id="tes_4",
-    description='latihan 4',
+    dag_id="tes_5",
+    description='latihan 5',
     default_args={
         'depends_on_past': False,
         'retries': 3,
@@ -55,8 +55,11 @@ with DAG(
     start = EmptyOperator(task_id="start")
 
     with TaskGroup("tier_1", tooltip="tier 1 dependency") as tier_1:
-        t_dbo__current_cc_scmcaccp = ExternalPythonOperator(task_id="dbo__current_cc_scmcaccp",python_callable=run_job,op_kwargs={"module_name": "dbo__current_cc_scmcaccp","job_dir": JOB_DIR},python=VENV_PATH)
-
+        t_rnacen__ontology_terms = ExternalPythonOperator(task_id="rnacen__ontology_terms",python_callable=run_job,op_kwargs={"module_name": "rnacen__ontology_terms","job_dir": JOB_DIR},python=VENV_PATH)
+        t_rnacen__rfam_clans = ExternalPythonOperator(task_id="rnacen__rfam_clans",python_callable=run_job,op_kwargs={"module_name": "rnacen__rfam_clans","job_dir": JOB_DIR},python=VENV_PATH)
+        t_rnacen__rfam_models = ExternalPythonOperator(task_id="rnacen__rfam_models",python_callable=run_job,op_kwargs={"module_name": "rnacen__rfam_models","job_dir": JOB_DIR},python=VENV_PATH)
+        t_rnacen__rnc_release = ExternalPythonOperator(task_id="rnacen__rnc_release",python_callable=run_job,op_kwargs={"module_name": "rnacen__rnc_release","job_dir": JOB_DIR},python=VENV_PATH)
+        
     end = EmptyOperator(task_id="end")
     
     start >> tier_1 >> end
