@@ -2,7 +2,6 @@ name: training-airflow
 
 x-airflow-common:
   &airflow-common
-  image: apache/airflow:2.9.1-python3.10
   networks:
     - shared-network
   env_file:
@@ -56,6 +55,7 @@ services:
 
   airflow-webserver:
     <<: *airflow-common
+    image: apache/airflow:2.9.1-python3.10
     container_name: training-airflow-airflow-webserver
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor

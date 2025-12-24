@@ -1,1 +1,1 @@
-docker-compose -p training-airflow -f compose.yml up -d
+docker-compose -p training-airflow -f compose.yml up -d --build

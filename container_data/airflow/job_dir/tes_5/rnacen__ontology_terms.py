@@ -1,12 +1,13 @@
 ##################################################
 # import installed library
 ##################################################
-import psycopg
+from psycopg import connect
 
 ##################################################
 # import default library
 ##################################################
-from csv import writer as csv_writer, QUOTE_ALL
+from csv import writer as csv_writer, QUOTE_ALL, QUOTE_MINIMAL
+from re import findall
 
 ##################################################
 
@@ -41,9 +42,14 @@ def create_url(product: str, credential_name: str) -> str:
 ##################################################
 def main():
     input_url = create_url("postgresql","hh-pgsql-public.ebi.ac.uk pfmegrnargs")
-    with psycopg.connect(conninfo=input_url) as connection:
+    with connect(conninfo=input_url) as connection:
         with connection.cursor() as cursor:
             cursor.execute("select * from rnacen.ontology_terms")
+            columns_description=cursor.description
+            columns_name: list[tuple[str]] = [(findall(r"<Column\s+'([^']+)'", str(column_description))[0] for column_description in columns_description)]
+            with open(f"{OUTPUT_DIRECTORY}/rnacen__ontology_terms.csv", "a", newline="", encoding="utf-8") as f:
+                writer = csv_writer(f, delimiter="|", quotechar='"', quoting=QUOTE_MINIMAL)
+                writer.writerows(columns_name)
             for i in range(0,10):
                 data = cursor.fetchmany(size=100)
                 with open(f"{OUTPUT_DIRECTORY}/rnacen__ontology_terms.csv", "a", newline="", encoding="utf-8") as f:
