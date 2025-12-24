@@ -1,7 +1,7 @@
 ##################################################
 # import installed library
 ##################################################
-import psycopg
+from psycopg import connect
 
 ##################################################
 # import default library
@@ -41,7 +41,7 @@ def create_url(product: str, credential_name: str) -> str:
 ##################################################
 def main():
     input_url = create_url("postgresql","hh-pgsql-public.ebi.ac.uk pfmegrnargs")
-    with psycopg.connect(conninfo=input_url) as connection:
+    with connect(conninfo=input_url) as connection:
         with connection.cursor() as cursor:
             cursor.execute("select * from rnacen.rfam_clans")
             for i in range(0,10):
